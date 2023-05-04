@@ -1,5 +1,20 @@
 {% extends "network/layout.html" %}
+{% load static %}
 
 {% block body %}
-    TODO
+    <h3>All Posts</h3>
+    <div id="newpost-view">
+        <h4>New Post</h4>
+        <form id="newpost-form">
+            <textarea id="post-content"></textarea><br>
+            <input type="submit" value="Post">
+        </form>
+    </div>
+    <div id="post-view"></div>
 {% endblock %}
+
+{% block script %}
+    <script src="{% static 'network/index.js' %}"></script>
+{% endblock %}
+
+<!-- style="border:1px solid black" -->

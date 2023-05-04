@@ -1,10 +1,14 @@
+import json
 from django.contrib.auth import authenticate, login, logout
 from django.db import IntegrityError
+from django.http import JsonResponse
 from django.http import HttpResponse, HttpResponseRedirect
 from django.shortcuts import render
 from django.urls import reverse
+from django.views.decorators.csrf import csrf_exempt
+from django.contrib.auth.decorators import login_required
 
-from .models import User
+from .models import User, Post
 
 
 def index(request):
@@ -61,3 +65,41 @@ def register(request):
         return HttpResponseRedirect(reverse("index"))
     else:
         return render(request, "network/register.html")
+    
+
+@csrf_exempt
+@login_required    
+def newpost(request):
+
+    # Composing a new post must be via POST
+    if request.method == "POST":
+    
+        # Get the post data
+        data = json.loads(request.body)
+
+        # Get the post content
+        content = data.get("content", "")
+
+        # Save the content to the database
+        newpost = Post(user=request.user, content=content)
+        newpost.save()
+
+        return JsonResponse({"message": "Posted successfully."}, status=201)
+    
+    # if request.method == "GET":
+    #     posts = Post.objects.filter(user=request.user)
+
+    #     # Return posts in reverse chronologial order
+    #     # posts = posts.order_by("-timestamp").all()
+    #     return JsonResponse([post.serialize() for post in posts], safe=False)
+    
+    else:
+        return JsonResponse({"error": "POST or GET request required."}, status=400)
+
+# @login_required    
+def post(request):
+    posts = Post.objects.all()
+
+    # Return posts in reverse chronologial order
+    posts = posts.order_by("-timestamp").all()
+    return JsonResponse([post.serialize() for post in posts], safe=False)

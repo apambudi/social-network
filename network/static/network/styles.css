@@ -1,0 +1,12 @@
+textarea {
+    width: 600px;
+}
+
+.body {
+    margin-left: 20px;
+    color: black;
+}
+
+#newpost-view {
+    border: 1px solid black;
+}
