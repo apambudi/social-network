@@ -30,18 +30,12 @@ function load_post() {
     // Send a GET request to the URL
     fetch('/post')
     .then(response => response.json())
-    .then(posts => {posts.forEach(post => {
+    .then(posts => {
+        posts.forEach(post => {
         console.log(post);
         let element = document.createElement('div');
         element.style.border = "dotted";
-        // element.setAttribute("id", "show-post");
-        // let element1 = document.createElement('div')
-        // element1.innerHTML = `${post.username}`;
-        // document.querySelector('#show-post').append(element1);
         element.innerHTML = `<a href="/profile/${post.user_id}">${post.username}</a><br>${post.content}<br>${post.timestamp}<br>${post.like} like(likes)<br>`;
-        // show_post(post.username)
-        // `${post.username}<br>${post.content}<br>${post.timestamp}<br>${post.like} like(likes)<br>`;
-        // post.content, post.timestamp, post.like
         document.querySelector('#post-view').append(element);
         });
     })

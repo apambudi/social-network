@@ -27,5 +27,9 @@ class Follow(models.Model):
 
     def __str__(self):
         return f"{self.follower.username} follows {self.followed.username}"
-
-
+        # return {
+        #     "follower_id": self.follower.id,
+        #     "follower_name": self.follower.username,
+        #     "followed_id": self.followed.id,
+        #     "followed_name": self.followed.username,
+        # }

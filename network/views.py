@@ -150,4 +150,20 @@ def unfollow(request, user_id):
     Follow.objects.filter(follower = user_login_id, followed = user_id).delete()
     return JsonResponse({"message": "unfollow successfully"}, status = 201)
 
+@login_required
+def following(request):
+    return render(request, "network/following.html")
 
+@login_required
+def follow_post(request):
+    user_login_id = request.user.id
+    follows = Follow.objects.filter(follower=user_login_id)
+    posts = []
+    for follow in follows:
+        followed_id = follow.followed.id
+        post = Post.objects.filter(user=followed_id)
+        posts += post
+
+    # Return posts in reverse chronologial order
+    # posts = posts.order_by("-timestamp").all()
+    return JsonResponse([post.serialize() for post in posts], safe=False)
