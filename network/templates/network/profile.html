@@ -1,0 +1,18 @@
+{% extends "network/layout.html" %}
+{% load static %}
+
+{% block body %}
+    <div id="followers-count" data-value="{{ user_id }}"></div>
+
+    <!-- if the login user the viewed user are not the same, then show follow-unfollow toggle button -->
+    {% if user.id != user_id %}
+    <button id="follow-button" data-value="{{ user.id }}"></button>
+    {% endif %}
+
+    <div id="user-post-view"></div>
+{% endblock %}
+
+
+{% block script %}
+<script src="{% static 'network/profile.js' %}"></script>
+{% endblock %}

@@ -8,12 +8,15 @@ from django.urls import reverse
 from django.views.decorators.csrf import csrf_exempt
 from django.contrib.auth.decorators import login_required
 
-from .models import User, Post
-
+from .models import User, Post, Follow
 
 def index(request):
     return render(request, "network/index.html")
 
+def profile_view(request, user_id):
+    return render(request, "network/profile.html", {
+        "user_id": user_id,
+    })
 
 def login_view(request):
     if request.method == "POST":
@@ -96,10 +99,55 @@ def newpost(request):
     else:
         return JsonResponse({"error": "POST or GET request required."}, status=400)
 
-# @login_required    
+@login_required    
 def post(request):
     posts = Post.objects.all()
 
     # Return posts in reverse chronologial order
     posts = posts.order_by("-timestamp").all()
     return JsonResponse([post.serialize() for post in posts], safe=False)
+
+@login_required    
+def user_post(request, user_id):
+    posts = Post.objects.filter(user=user_id)
+
+    # Return posts in reverse chronologial order
+    posts = posts.order_by("-timestamp").all()
+    return JsonResponse([post.serialize() for post in posts], safe=False)
+
+@login_required
+def follow_count(request, user_id):
+    
+    number_of_followers = Follow.objects.filter(followed=user_id).count()
+    number_of_following = Follow.objects.filter(follower=user_id).count()
+
+    #Return posts in reverse chronological order
+    return JsonResponse({'followers_number': number_of_followers, 'following_number': number_of_following}, safe=False)
+
+@login_required
+def follow_check(request, user_id):
+    user_login_id = request.user.id
+    if Follow.objects.filter(follower = user_login_id, followed=user_id).exists():
+        return JsonResponse({'test': True}, safe=False)
+    else:
+        return JsonResponse({'test': False}, safe=False)
+    
+@login_required
+def follow(request, user_id):
+    user_login_id = request.user.id
+    follower = User.objects.get(pk=user_login_id)
+    followed = User.objects.get(pk=user_id)
+
+    # Create a new follow
+    new_f = Follow(follower=follower, followed=followed)
+    new_f.save()
+
+    return JsonResponse({"message": f"{follower.username} follows {followed.username} successfully"}, status = 201)
+    
+@login_required
+def unfollow(request, user_id):
+    user_login_id = request.user.id
+    Follow.objects.filter(follower = user_login_id, followed = user_id).delete()
+    return JsonResponse({"message": "unfollow successfully"}, status = 201)
+
+
